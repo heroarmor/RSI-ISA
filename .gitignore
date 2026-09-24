@@ -1,0 +1,7 @@
+build/
+*.riscv
+*.o
+*.dasm
+*.log
+trace_*
+__pycache__/
