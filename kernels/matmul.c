@@ -36,5 +36,5 @@ int main(void) {
         /* Prevent dead code elimination */
         A[0][0] += (iter & 1);
     }
-    return (int)(total & 0xFF);
+    return (int)total;
 }

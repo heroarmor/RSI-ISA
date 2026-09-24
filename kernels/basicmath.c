@@ -92,5 +92,5 @@ int main(void) {
         total += mat_c[0][0] + mat_c[3][3];
     }
 
-    return (int)(total & 0xFF);
+    return (int)total;
 }

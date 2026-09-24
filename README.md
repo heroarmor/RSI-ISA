@@ -66,10 +66,19 @@ through HTIF `tohost`:
 | `fft` | telecomm/FFT (fixed point) | | |
 
 Each kernel is compiled with `-O3 -fno-builtin -nostdlib -mcmodel=medany
--mabi=lp64d`, linked with `runtime/link.ld` at `0x80000000`, and writes
-`tohost = 1` on completion. Correctness is checked by the simulator's
-`tohost` exit status; a kernel that traps, hangs or exits non-zero is not
-scored.
+-mabi=lp64d`, linked with `runtime/link.ld` into a single loadable segment
+at `0x80000000` (the CVA6 harness preloads only that segment), and returns a
+32-bit checksum of its result from `main`. Each kernel object is linked
+twice: the **timing ELF** (`<config>_<kernel>.riscv`) exits 0 and is run for
+its cycle count; the **checksum ELF** (`<config>_<kernel>.chk.riscv`) exits
+with the low 31 bits of the checksum in the HTIF exit code, which both
+harnesses print. Two ELFs are needed because the Chipyard harness prints its
+cycle count only on a zero exit, and the HTIF console cannot be used to
+report the value (the CVA6 rvfi tracer ends the simulation on the first
+`tohost` store, and on the Chipyard TSI harness each console character costs
+about a million cycles). A run is correct only if the timing run completes
+**and** the checksum equals the baseline's checksum for the same kernel; a
+kernel that traps, hangs, or computes a different result is not scored.
 
 ## Quick start (baseline on lane A)
 
@@ -93,17 +102,21 @@ scripts/geomean.py --baseline results/zbb/cycles.csv --candidate results/cand/cy
 
 `scripts/geomean.py` computes, over the 13 kernels,
 `exp(mean(log(cycles_candidate / cycles_baseline)))`. Lower is better. A
-candidate with any kernel that did not complete under the gate is
-**unscored**, not penalised: the run is reported as invalid.
+candidate with any kernel that did not complete under the gate, or whose
+checksum differs from the baseline's, is **unscored**, not penalised: the
+run is reported as invalid.
 
 Completion gates:
 
-- **CVA6 (lanes A, B):** the `rvfi_tracer` line `terminated after N cycles`
-  must be present and the harness must print `*** SUCCESS ***`. A `SUCCESS`
-  line without the `rvfi_tracer` line means the wall-clock timeout killed
-  the run and the printed cycle count is meaningless.
-- **Chipyard (lane C):** the harness must print `*** PASSED ***` and
-  `Completed after N cycles`.
+- **CVA6 (lanes A, B):** the timing run must print the `rvfi_tracer` line
+  `terminated after N cycles` together with `*** SUCCESS *** (tohost = 0)
+  after M cycles`; `M` is the cycle count. A harness line without the
+  `rvfi_tracer` line means the wall-clock timeout killed the run. The
+  checksum run prints `(tohost = N)` with the checksum `N`.
+- **Chipyard (lane C):** the timing run must print `*** PASSED ***
+  Completed after N simulation cycles`; the checksum run prints
+  `*** FAILED *** (tohost = N)` with the checksum `N` (or passes when the
+  checksum is 0).
 
 ## Toolchain pins
 

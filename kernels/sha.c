@@ -53,5 +53,5 @@ int main(void) {
         sha1_transform(test_block);
         total ^= h0 ^ h1 ^ h2 ^ h3 ^ h4;
     }
-    return (int)(total & 0xFF);
+    return (int)total;
 }

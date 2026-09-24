@@ -90,5 +90,5 @@ int main(void) {
         total += err;
     }
 
-    return (int)(total & 0xFF);
+    return (int)total;
 }

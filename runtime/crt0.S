@@ -29,8 +29,21 @@ _start:
     la t0, _cycle_count
     sd s2, 0(t0)
 
-    # Always exit with success (code 0 -> tohost = 1)
-    li t0, 1          # (0 << 1) | 1 = 1 = success
+#ifdef CHECKSUM_EXITCODE
+    # Checksum ELF (<config>_<kernel>.chk.riscv): carry the low 31 bits of main's
+    # return value in the HTIF exit code, tohost = (checksum31 << 1) | 1. Both the
+    # CVA6 harness ("(tohost = N)") and the Chipyard harness ("*** FAILED ***
+    # (tohost = N)") print it. This ELF is run only to read the checksum.
+    slli t0, a0, 33
+    srli t0, t0, 33   # t0 = a0 & 0x7fffffff
+    slli t0, t0, 1
+    ori  t0, t0, 1
+#else
+    # Timing ELF (<config>_<kernel>.riscv): always exit 0 so both harnesses print
+    # their cycle count (Chipyard prints it only on a successful exit). The kernel
+    # object code is identical to the checksum ELF; only this exit stub differs.
+    li t0, 1          # (0 << 1) | 1 = exit code 0
+#endif
     la t1, tohost
     sd t0, 0(t1)
 3:  j 3b

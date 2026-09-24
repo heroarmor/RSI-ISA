@@ -38,6 +38,10 @@ pinned tag running the `rv64g_zbb` reference build.
 simulator-chipyard.harness-<config> +permissive +verbose +permissive-off <elf>
 ```
 
-`scripts/run_chipyard.sh` wraps this and applies the completion gate
-(`*** PASSED ***` and `Completed after N cycles` on stderr). Put the
-directory containing `libriscv.so` on `LD_LIBRARY_PATH`.
+`scripts/run_chipyard.sh` wraps this: it runs the timing ELF for the cycle
+count (`*** PASSED *** Completed after N simulation cycles` on stderr) and
+the `.chk.riscv` ELF for the checksum (`*** FAILED *** (tohost = N)`, printed
+by the harness before it stops on the nonzero exit code). Put the directory
+containing `libriscv.so` on `LD_LIBRARY_PATH`. Loading a kernel over TSI and
+running it costs several hundred thousand cycles on top of the kernel itself;
+this overhead is identical for baseline and candidate.

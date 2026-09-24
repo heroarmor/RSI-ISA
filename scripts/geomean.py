@@ -7,7 +7,9 @@ Score = geometric mean over kernels of cycles(candidate) / cycles(baseline).
 Lower is better; 1.0 means parity with the baseline.
 
 A row is valid only if it completed: for the CVA6 runner this means
-rvfi_term != NONE and status == SUCCESS; for the Chipyard runner status == PASS.
+rvfi_term != NONE and status == DONE; for the Chipyard runner status == PASS.
+A candidate row is additionally valid only if its checksum equals the
+baseline's checksum for that kernel (the kernel computed the same result).
 If any kernel present in the baseline lacks a valid candidate row, the
 candidate is unscored and the script exits with status 2.
 """
@@ -29,9 +31,9 @@ def load(path):
                 cyc = int(row.get("cycles", ""))
             except ValueError:
                 continue
-            ok = row.get("status") in ("SUCCESS", "PASS") and row.get("rvfi_term", "x") != "NONE" and cyc > 0
+            ok = row.get("status") in ("DONE", "PASS") and row.get("rvfi_term", "x") != "NONE" and cyc > 0 and row.get("checksum", "NA") != "NA"
             if ok:
-                out[k] = cyc
+                out[k] = (cyc, row.get("checksum", "NA"))
     return out
 
 
@@ -46,16 +48,21 @@ def main():
     if missing:
         print(f"baseline lacks valid rows for: {' '.join(missing)}", file=sys.stderr)
         return 2
-    invalid = [k for k in a.kernels if k not in cand]
-    print(f"{'kernel':<14}{'baseline':>14}{'candidate':>14}{'ratio':>10}")
+    invalid = []
+    print(f"{'kernel':<14}{'baseline':>14}{'candidate':>14}{'ratio':>10}  {'checksum'}")
     logs = []
     for k in a.kernels:
-        if k in cand:
-            r = cand[k] / base[k]
+        bcyc, bck = base[k]
+        if k in cand and cand[k][1] == bck and bck != "NA":
+            r = cand[k][0] / bcyc
             logs.append(math.log(r))
-            print(f"{k:<14}{base[k]:>14,}{cand[k]:>14,}{r:>10.4f}")
+            print(f"{k:<14}{bcyc:>14,}{cand[k][0]:>14,}{r:>10.4f}  {bck} ok")
+        elif k in cand:
+            invalid.append(k)
+            print(f"{k:<14}{bcyc:>14,}{cand[k][0]:>14,}{'-':>10}  {cand[k][1]} != {bck} MISMATCH")
         else:
-            print(f"{k:<14}{base[k]:>14,}{'INVALID':>14}{'-':>10}")
+            invalid.append(k)
+            print(f"{k:<14}{bcyc:>14,}{'INVALID':>14}{'-':>10}")
     if invalid:
         print(f"UNSCORED: no valid candidate result for {' '.join(invalid)}", file=sys.stderr)
         return 2

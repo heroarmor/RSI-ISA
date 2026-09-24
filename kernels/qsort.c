@@ -40,5 +40,5 @@ int main(void) {
         quicksort(arr, 0, ARRAY_SIZE - 1);
         total += arr[0] + arr[ARRAY_SIZE/2] + arr[ARRAY_SIZE-1];
     }
-    return (int)(total & 0xFF);
+    return (int)total;
 }

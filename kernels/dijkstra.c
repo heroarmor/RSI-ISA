@@ -69,5 +69,5 @@ int main(void) {
             total += dist[NUM_NODES - 1];
         }
     }
-    return total & 0xFF;
+    return total;
 }

@@ -61,9 +61,10 @@ static int kmp_search(const char *text, int tlen, const char *pat, int plen) {
 }
 
 int main(void) {
-    /* Fill text with repeating pattern + noise */
+    /* Fill text with the repeating alphabet ABCD so the pattern occurs often;
+       the per-iteration mutation below then breaks a growing number of matches. */
     for (int i = 0; i < TEXT_LEN; i++)
-        text[i] = 'A' + ((i * 3 + i / 7) % 8);
+        text[i] = 'A' + (i % 4);
 
     kmp_build(pattern, PAT_LEN);
 
@@ -74,5 +75,5 @@ int main(void) {
         /* Mutate text slightly */
         text[iter % TEXT_LEN] = 'A' + (iter % 8);
     }
-    return total & 0xFF;
+    return total;
 }

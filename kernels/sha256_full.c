@@ -90,5 +90,5 @@ int main(void) {
         sha256_transform(test_block);
         total ^= H[0] ^ H[4];
     }
-    return (int)(total & 0xFF);
+    return (int)total;
 }

@@ -29,11 +29,16 @@ The binary is dynamically linked against `libriscv.so`, `libstdc++`,
 Variane_testharness +time_out=<max simulated cycles> +tohost_addr=80001000 <elf>
 ```
 
-`scripts/run_cva6.sh` wraps this, runs each ELF in a private temporary
-directory (the model writes multi-gigabyte `trace_*.dasm` files into its
-working directory), and applies the completion gate.
+`scripts/run_cva6.sh` wraps this, runs each timing and checksum ELF in a
+private temporary directory (the model writes multi-gigabyte `trace_*.dasm`
+files into its working directory), and applies the completion gate.
 
 ## Behaviour to know
+
+- The harness preloads memory from the ELF segment whose address is exactly
+  `0x80000000` and ignores every other segment. `runtime/link.ld` therefore
+  forces a single RWX program header; an ELF linked any other way runs with
+  zeroed `.rodata`/`.data` and produces wrong checksums.
 
 - Throughput is roughly 18 to 28 thousand simulated cycles per second.
 - With CV-X-IF enabled, an instruction the decoder does not recognise is

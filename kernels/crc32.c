@@ -38,7 +38,7 @@ int main(void) {
     uint32_t total = 0;
     for (int iter = 0; iter < 100; iter++) {
         total ^= crc32(test_buf, 256);
-        test_buf[iter & 0xFF] ^= (uint8_t)(iter >> 8);
+        test_buf[iter & 0xFF] ^= (uint8_t)(iter + 1);  /* perturb the buffer every iteration */
     }
-    return (int)(total & 0xFF);
+    return (int)total;
 }

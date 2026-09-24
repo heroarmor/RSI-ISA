@@ -39,5 +39,5 @@ int main(void) {
         fir_filter(input, output, coeffs, SAMPLES, TAPS);
         total += output[0] + output[SAMPLES/2];
     }
-    return (int)(total & 0xFF);
+    return (int)total;
 }

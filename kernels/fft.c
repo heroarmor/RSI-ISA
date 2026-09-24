@@ -89,5 +89,5 @@ int main(void) {
         fft_fixed();
         total += real[1] + imag[1];
     }
-    return (int)(total & 0xFF);
+    return (int)total;
 }
