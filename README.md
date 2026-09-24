@@ -129,6 +129,14 @@ Completion gates:
 | CVA6 | `openhwgroup/cva6` commit `02e11e3b9d9e6a087dc4811b933bf0cc80156e1a` |
 | Chipyard | tag `1.13.0`; BOOM submodule `d2a64f7ca9fd914d9c686cb23edcd32d3465a02e` |
 
+## Author
+
+Kangqi Zhang (GitHub [heroarmor](https://github.com/heroarmor), homepage
+[kangqizhang.com](https://kangqizhang.com), contact `zhkangqi@purdue.edu`).
+This environment is derived from the author's `Best_ISA` project on ISA
+synthesis for fixed processor RTL and is the source of an OpenRSI Index task
+proposal.
+
 ## License
 
 AGPL-3.0-only. The kernels are the author's simplified re-implementations
