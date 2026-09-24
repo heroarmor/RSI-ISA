@@ -6,7 +6,7 @@
 
 #define TAPS 32
 #define SAMPLES 1024
-#define ITERATIONS 500
+#define ITERATIONS 50
 
 static int32_t coeffs[TAPS] = {
     1, -3, 5, -7, 11, -13, 17, -19,

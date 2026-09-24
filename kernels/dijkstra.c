@@ -63,7 +63,7 @@ static void dijkstra(int src) {
 int main(void) {
     init_graph();
     int total = 0;
-    for (int iter = 0; iter < 100; iter++) {
+    for (int iter = 0; iter < 10; iter++) {
         for (int src = 0; src < NUM_NODES; src++) {
             dijkstra(src);
             total += dist[NUM_NODES - 1];
